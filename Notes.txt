@@ -1,0 +1,102 @@
+We can run the program in command line by typing 
+
+node index.js
+
+or 
+
+npm start
+
+npm start works because in package.json, we wrote 
+"start": "node index.js"
+as part of the scripts.
+------------------------------------------------------------------------------
+
+If we make changes in our application, then we have to stop it in the console
+with ctrl + c and then restart it for changes to take effect.
+We can make the server track our changes with this:
+
+node --watch index.js
+
+Now, changes to the application's code will cause the server to restart automatically.
+------------------------------------------------------------------------------------------
+
+For HTTP DELETE, we could test with Postman:
+Open postman, put the url to delete such as 
+http://localhost:3001/api/notes/2
+Then click DELETE and click send.
+
+----------------------------------------------------------------------------
+If you use Visual Studio Code, you can use the VS Code REST client plugin instead of Postman.
+
+We make a directory at the root of the application named requests. 
+We save all the REST client requests in the directory as files that end with the .rest extension.
+
+Let's create a new get_all_notes.rest file and define the request that fetches all notes.
+By clicking the Send Request text, the REST client will execute the HTTP request and 
+the response from the server is opened in the editor.
+
+----------------------------------------------------------------------------
+With the REST client extension in vscode, 
+you can also add multiple requests in the same file using ### separators
+
+Ex:
+GET http://localhost:3001/api/notes/
+
+###
+POST http://localhost:3001/api/notes/ HTTP/1.1
+content-type: application/json
+
+{
+    "name": "sample",
+    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+}
+----------------------------------------------------------------------------
+Middleware is a function that receives three parameters: (request, response, next).
+
+The next function yields control to the next middleware.
+
+Middleware is used like this: app.use(requestLogger)
+json-parser is listed before requestLogger:
+app.use(express.json())
+app.use(requestLogger) 
+because otherwise request.body will not be initialized when the logger is executed!
+
+Middleware functions have to be used before routes when we want them 
+to be executed by the route event handlers.
+
+ Sometimes, we want to use middleware functions after routes. 
+ We do this when the middleware functions are only called if no route handler processes the HTTP request.
+ --------------------------------------------------------------------------------------------------------
+ A URL's origin is defined by the combination of protocol (AKA scheme), hostname, and port.
+
+http://example.com:80/index.html
+  
+protocol: http
+host: example.com
+port: 80
+
+When the browser sees reference(s) to a URL in the source HTML, it issues a request. 
+If the request is issued using the URL that the source HTML was fetched from, 
+then the browser processes the response without any issues. 
+Otherwise, the browser will have to check the Access-Control-Allow-origin response header:
+If it contains * on the URL of the source HTML, the browser will process the response, 
+otherwise the browser will refuse to process it and throws an error.
+
+To enable legitimate cross-origin requests (requests to URLs that don't share the same origin) 
+W3C came up with a mechanism called CORS(Cross-Origin Resource Sharing).
+
+By default, the JavaScript code of an application that runs in a browser can only communicate 
+with a server in the same origin. Because our server is in localhost port 3001, while our 
+frontend is in localhost port 5173, they do not have the same origin, so block access unless
+given access.
+
+We can allow requests from other origins by using Node's cors middleware:
+backend install cors:
+
+npm install cors
+
+Then to allow for requests from all origins:
+
+const cors = require('cors')
+app.use(cors())
+
