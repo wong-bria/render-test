@@ -116,8 +116,26 @@ a file corresponding to the request's address. If a correct file is found, Expre
 Because of our situation, both the frontend and the backend are at the same address, 
 we can declare baseUrl as a relative URL. This means we can leave out the part declaring the server,
 where the server part is like serveraddress in www.serversaddress.com/api/notes
+----------------------------------------------------------------------------
+In frontend, we added
 
+server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    }
+  },
 
+to vite.config.js file so if there is a request to a path starting with http://localhost:5173/api, 
+the request will be forwarded to the server at http://localhost:3001.
+
+so the frontend code works in development mode and production mode. Thus,
+from the frontend's perspective all requests are made to http://localhost:5173, 
+which is the single origin, there is no longer a need for the backend's cors middleware
+so we can remove cors library from the backend's index.js file and do 
+npm remove cors
 
 
 
